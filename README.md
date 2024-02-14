@@ -9,7 +9,7 @@
 
 >:warning: **This project is still in development, and is not ready for use.**
 
-ThreatCheck is a malware-analysis tool that identify the exact position and details of malicious content in binary files using external Anti-Virus scanners.
+MultCheck is a malware-analysis tool that identify the exact position and details of malicious content in binary files using external Anti-Virus scanners.
 
 Takes a binary as input, splits it until it pinpoints that exact bytes that the target engine will flag on and prints them to the screen. This can be helpful in confirming AV scan results and furthering investigation when analyzing malware.
 <div id="original"></div>
@@ -20,7 +20,7 @@ Takes a binary as input, splits it until it pinpoints that exact bytes that the 
 
 -  Run `go build` under the root directory of the project.
 
--  Or directly run the compiled binaries in [Releases](https://github.com/PACHAKUTlQ/ThreatCheck/releases).
+-  Or directly run the compiled binaries in [Releases](https://github.com/MultSec/MultCheck/releases).
 
 
 
@@ -45,13 +45,13 @@ scanners:
 ```
 
 -  Note that the scanner executable is **STRONGLY RECOMMENDED to be added into PATH** due to possible spaces in the absolute path of the scanner
--  `./ThreatCheck -h` for help information
--  `./ThreatCheck -f <target_file>` for scanning a file
+-  `./MultCheck -h` for help information
+-  `./MultCheck -f <target_file>` for scanning a file
 
 ## Demo
 
 ```powershell
-PS > ./ThreatCheck -f D:/fakepath/mimikatz.sfx.exe
+PS > ./MultCheck -f D:/fakepath/mimikatz.sfx.exe
 Result: Detected (Static)
 
 0004fb99  31 1c  31 20  31 24  31 28  31 2c  31 30  31 34  31 38  1·1 1$1(1,101418
