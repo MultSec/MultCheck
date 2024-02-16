@@ -17,7 +17,6 @@ Takes a binary as input, splits it until it pinpoints that exact bytes that the 
 >  idea from [DefenderCheck](https://github.com/matterpreter/DefenderCheck), [ThreatCheck](https://github.com/rasta-mouse/ThreatCheck) and [ThreatCheck](https://github.com/PACHAKUTlQ/ThreatCheck)
 
 ## Installation
-
 -  Run `go build` under the root directory of the project.
 
 -  Or directly run the compiled binaries in [Releases](https://github.com/MultSec/MultCheck/releases).
