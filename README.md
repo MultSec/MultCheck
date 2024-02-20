@@ -21,7 +21,11 @@ Takes a binary as input, splits it until it pinpoints that exact bytes that the 
 
 -  Or directly run the compiled binaries in [Releases](https://github.com/MultSec/MultCheck/releases).
 
-
+```bash
+$ go build -o multcheck main.go
+# Build for Windows
+$ GOOS=windows go build -o multcheck.exe main.go
+```
 
 ## Usage
 
@@ -29,23 +33,15 @@ Takes a binary as input, splits it until it pinpoints that exact bytes that the 
 
 `config.yaml`:
 
-```yaml
-scanners:
-  # - name: "AV name"
-  #   scanCmd: "Command for scanning the target file. Use {{file}} as the file name to be scanned. The scanner executable is STRONGLY RECOMMENDED to be in PATH."
-  #   posOutput: "A string in output of positive detection but not in negative"
-  - name: "ESET"
-    scanCmd: "ecls /clean-mode=none /no-quarantine {{file}}"
-    posOutput: ">"
-  - name: "Windows Defender"
-    scanCmd: "MpCmdRun.exe -Scan -ScanType 3 -File {{file}} -DisableRemediation -Trace -Level 0x10"
-    posOutput: "Threat information"
-  # - name: "Any others"
+```toml
+[scanner]
+name: "AV name"
+cmd: "Command (with full PATH) for scanning the target file. Use {{file}} as the file name to be scanned."
+out: "A string present in positive detection but not in negative"
 ```
 
--  Note that the scanner executable is **STRONGLY RECOMMENDED to be added into PATH** due to possible spaces in the absolute path of the scanner
--  `./MultCheck -h` for help information
--  `./MultCheck -f <target_file>` for scanning a file
+-  Note that the scanner executable is due to possible spaces in the absolute path of the scanner
+-  `./MultCheck <target_file>` for scanning a file
 
 ## Demo
 
