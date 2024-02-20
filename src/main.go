@@ -4,13 +4,13 @@ import (
 	"flag"
 	"fmt"
 	"os"
-	"github.com/MultSec/multcheck/utils"
-	"github.com/MultSec/multcheck/scan"
+	"github.com/MultSec/MultCheck/pkg/utils"
+	"github.com/MultSec/MultCheck/pkg/scan"
 )
 
 func main() {
 	var scanner string
-	flag.StringVar(&scanner, "scanner", "winDef", "Name of the scanner to be used. (Config file can be use instead)")
+	flag.StringVar(&scanner, "scanner", "winDef", "Name of the scanner to be used or config file to be used.")
 	flag.Parse()
 
 	args := flag.Args()
@@ -22,8 +22,8 @@ func main() {
 	binaryPath := args[0]
 
 	// Retrieve scanner configuration
-	conf := utils.getConf(scanner)
+	conf := utils.GetConf(scanner)
 
-	result := scan.checkMal(binaryPath, conf)
+	result := scan.CheckMal(binaryPath, conf)
 	fmt.Printf("[*] Result:\n%s\n", result)
 }

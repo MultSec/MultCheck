@@ -28,11 +28,16 @@ $ GOOS=windows go build -o multcheck.exe main.go
 ```
 
 ## Usage
+MultCheck accepts a payload to scan with Windows Defender as default:
+`./multcheck <target_file>`
 
--  Edit `config.yaml` to configure external scanners. Supports all kinds of CLI scanners. If no `config.yaml` found in the current directory, a template will be generated.
+Different built-in scanners can be also be used:
+`./multcheck -scanner winDef <target_file>`
 
-`config.yaml`:
+For custom scanners a configuration file should be provided:
+`./multcheck -scanner C:\path\to\config\file.toml <target_file>`
 
+An example of a configuration file is the following:
 ```toml
 [scanner]
 name: "AV name"
@@ -46,7 +51,7 @@ out: "A string present in positive detection but not in negative"
 ## Demo
 
 ```powershell
-PS > ./MultCheck -f D:/fakepath/mimikatz.sfx.exe
+PS > ./multcheck -scanner winDef D:/fakepath/mimikatz.exe
 Result: Detected (Static)
 
 0004fb99  31 1c  31 20  31 24  31 28  31 2c  31 30  31 34  31 38  1·1 1$1(1,101418

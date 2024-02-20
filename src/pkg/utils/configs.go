@@ -13,7 +13,7 @@ type config struct {
 	out  string `toml:"out"`
 }
 
-func fileToConf(configPath string) map[string]string {
+func FileToConf(configPath string) map[string]string {
 	data, err := os.ReadFile(configPath)
 	if err != nil {
 		fmt.Println("[!] Error opening config file:", err)
@@ -36,11 +36,11 @@ func fileToConf(configPath string) map[string]string {
 	return confMap
 }
 
-func getConf(scanner string) map[string]string {
+func GetConf(scanner string) map[string]string {
 	// Check if its a config file
 	re := regexp.MustCompile(`(?i)\.toml$`)
 	if re.MatchString(scanner){
-		return fileToConf(scanner)
+		return FileToConf(scanner)
 	}
 
 	// Check if its one of the built in scanners

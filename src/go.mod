@@ -1,4 +1,4 @@
-module github.com/MultSec/multcheck
+module github.com/MultSec/MultCheck
 
 go 1.22.0
 
