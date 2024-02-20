@@ -45,9 +45,6 @@ cmd: "Command (with full PATH) for scanning the target file. Use {{file}} as the
 out: "A string present in positive detection but not in negative"
 ```
 
--  Note that the scanner executable is due to possible spaces in the absolute path of the scanner
--  `./MultCheck <target_file>` for scanning a file
-
 ## Demo
 
 ```powershell
