@@ -25,5 +25,5 @@ func main() {
 	conf := utils.GetConf(scanner)
 
 	result := scan.CheckMal(binaryPath, conf)
-	fmt.Printf("[*] Result:\n%s\n", result)
+	fmt.Printf("[>] Result: %s\n", result)
 }
