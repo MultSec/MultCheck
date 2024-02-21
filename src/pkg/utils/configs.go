@@ -43,7 +43,23 @@ func GetConf(scanner string) map[string]string {
 		return FileToConf(scanner)
 	}
 
+	// Built in configurations for scanners
+	builtInConfs := make(map[string]map[string]string)
+
+	// Windows Defender
+	builtInConfs["winDef"] = map[string]string {
+		"name": "Windows Defender",
+		"cmd":	"MpCmdRun.exe -Scan -ScanType 3 -File {{file}} -DisableRemediation -Trace -Level 0x10",
+		"out":	"Threat information",
+	}
+
 	// Check if its one of the built in scanners
-	config := make(map[string]string)
+	config, isBuiltIn := builtInConfs[scanner]; 
+	
+	if !isBuiltIn {
+		fmt.Printf("[!] The scanner %s is not a built in scanner.\n", scanner)
+		os.Exit(1)
+	}
+
 	return config
 }
