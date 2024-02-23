@@ -126,36 +126,32 @@ func checkStatic(binaryPath string, conf map[string]string) string {
 		os.Exit(1)
 	}
 
+	// Set the initial values
+	lastGood, mid, upperBound := 0, len(data)/2, len(data)
+	threatFound := false
+
 	// Binary search for the malicious content
-	left, right := 0, len(data)
-	lastMaliciousEnd := right // The last known position of malicious content
-
-
-	for left < right {
-
-		// Set the cursor to the beginning of the line
-		mid := (left + right) / 2
+	for upperBound-lastGood > 1 {
+		// Get the current slice
 		currentData := data[:mid]
 
-		// Scan the current section
-		malicious := scanSlice(currentData, conf)
-
-		if malicious {
-			// The current section contains malicious content
-			lastMaliciousEnd = mid
-			right = mid
+		// Check the slice for malware
+		if scanSlice(currentData, conf) {
+			threatFound = true
+			upperBound = mid
 		} else {
-			// The current section is clean
-			left = mid + 1
+			lastGood = mid
 		}
+
+		mid = lastGood + (upperBound-lastGood)/2
 	}
 
-	// The malicious content is between 'left' and 'lastMaliciousEnd'
-	if lastMaliciousEnd == len(data) {
-		return "Payload not detected."
-	} else {
-		return fmt.Sprintf("Malicious content found at offset: %08x (%d bytes)\n%s", lastMaliciousEnd, len(data) - lastMaliciousEnd, hexDump(binaryPath, int64(lastMaliciousEnd)))
+	// Return the result
+	if threatFound {
+		return fmt.Sprintf("Malicious content found at offset: %08x (%d bytes)\n%s", lastGood, len(data)-lastGood, hexDump(binaryPath, int64(lastGood)))
 	}
+
+	return "Payload not detected."
 }
 
 func CheckMal(binaryPath string, conf map[string]string) string {

@@ -19,9 +19,13 @@ It is designed to be easy to use, and to be able to test multiple AV engines. It
 -  Or directly run the compiled binaries in [Releases](https://github.com/MultSec/MultCheck/releases).
 
 ```bash
-$ go build -o multcheck main.go
+$ cd src
 # Build for Windows
-$ GOOS=windows go build -o multcheck.exe main.go
+## 64-bit
+$ GOOS=windows GOARCH=amd64 go build -o ../bin/multcheck_x64.exe main.go
+
+## 32-bit
+$ GOOS=windows GOARCH=386 go build -o ../bin/multcheck_x32.exe main.go
 ```
 
 ## Usage
