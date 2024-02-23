@@ -42,21 +42,38 @@ Custom scanners can be added by creating a configuration file and providing the 
 - Windows Defender (winDef)
 
 ## Configuration
-The configuration file for custom scanners is a TOML file with the following structure:
+The configuration file for custom scanners is a JSON file with the following structure:
 
-```toml
-[scanner]
-name: "AV name"
-cmd: "Command (with full PATH) for scanning the target file. Use {{file}} as the file name to be scanned."
-out: "A string present in positive detection but not in negative"
+```json
+{
+  "name": "AV name",
+  "cmd": "Scan Program (with full PATH) for scanning the target file.",
+  "args": "Scan arguments, use {{file}} as the file name to be scanned.",
+  "out": "A string present in positive detection but not in negative"
+}
 ```
 
 ## Example
-```bash
-$ ./multcheck -scanner winDef test.exe
-[>] Result: Payload not detected.
+```powershell
+PS C:\Users\pengrey\Downloads> .\multcheck.exe -scanner .\windef.json C:\Users\pengrey\Downloads\mimikatz.exe
+[>] Result: Malicious content found at offset: 00000121
+00000000  d1 27 71 71 a9 b6 71 52  69 63 68 70 a9 b6 71 00  |.'qq..qRichp..q.|
+00000010  00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 50  |...............P|
+00000020  45 00 00 64 86 06 00 63  39 5a 5e 00 00 00 00 00  |E..d...c9Z^.....|
+00000030  00 00 00 f0 00 22 00 0b  02 09 00 00 2c 0c 00 00  |....."......,...|
 
-$
+
+PS C:\Users\pengrey\Downloads> .\multcheck.exe -scanner .\windef.json C:\Users\pengrey\Downloads\Rubeus.exe
+[>] Result: Malicious content found at offset: 00048e3d
+00000000  65 74 5f 61 64 64 69 74  69 6f 6e 61 6c 5f 74 69  |et_additional_ti|
+00000010  63 6b 65 74 73 00 67 65  74 5f 74 69 63 6b 65 74  |ckets.get_ticket|
+00000020  73 00 73 65 74 5f 74 69  63 6b 65 74 73 00 53 79  |s.set_tickets.Sy|
+00000030  73 74 65 6d 2e 4e 65 74  2e 53 6f 63 6b 65 74 73  |stem.Net.Sockets|
+
+
+PS C:\Users\pengrey\Downloads> .\multcheck.exe -scanner .\windef.json C:\Users\pengrey\Downloads\multcheck.exe
+[>] Result: Payload not detected.
+PS C:\Users\pengrey\Downloads>
 ```
 
 ## License
@@ -67,3 +84,4 @@ This project is inspired by the following projects:
 - [DefenderCheck](https://github.com/matterpreter/DefenderCheck)
 - [ThreatCheck](https://github.com/rasta-mouse/ThreatCheck)
 - [ThreatCheck](https://github.com/PACHAKUTlQ/ThreatCheck)
+- [GoCheck](https://github.com/gatariee/gocheck)

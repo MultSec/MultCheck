@@ -5,68 +5,19 @@ import (
 	"os"
 	"os/exec"
 	"strings"
+	"encoding/hex"
 )
-
-func hexDump(filename string, offset int64) string {
-	const bytesPerLine = 16
-	result := ""
-
-	data, err := os.ReadFile(filename)
-	if err != nil {
-		return fmt.Sprintf("[!] Error reading file: %s", err)
-		os.Exit(1)
-	}
-
-	// Iterate over the data
-	for i := offset - bytesPerLine; i < offset+bytesPerLine; i += bytesPerLine {
-		if i < 0 {
-			continue
-		}
-
-		// Print the offset
-		result += fmt.Sprintf("%08x |", i)
-
-		// Print the bytes
-		for j := i; j < i+bytesPerLine; j++ {
-			if j < 0 || j >= int64(len(data)) {
-				result += "	"
-			} else {
-				result += fmt.Sprintf("%02x ", data[j])
-			}
-		}
-
-		// Print the ASCII representation
-		result += "|"
-		for j := i; j < i+bytesPerLine; j++ {
-			if j < 0 || j >= int64(len(data)) {
-				result += " "
-			} else if data[j] >= 32 && data[j] <= 126 {
-				result += string(data[j])
-			} else {
-				result += "."
-			}
-		}
-
-		// Print the newline
-		result += "\n"
-	}
-
-	return result
-}
 
 func scanFile(binaryPath string, conf map[string]string) bool {
 	// Replace placeholder with actual file path
-	scanCommand := strings.Replace(conf["cmd"], "{{file}}", binaryPath, -1)
+	cmdArgs := strings.Replace(conf["args"], "{{file}}", binaryPath, -1)
+	scanArgs := strings.Fields(cmdArgs)
+	
+	// Execute the scanner command
+	cmd := exec.Command(conf["cmd"], scanArgs...)
 
-	// Execute scanner
-	cmdParts := strings.Fields(scanCommand)
-	cmd := exec.Command(cmdParts[0], cmdParts[1:]...)
-
-	output, err := cmd.CombinedOutput()
-	if err != nil {
-		fmt.Println("[!] Error executing scanner command:", err)
-		os.Exit(1)
-	}
+	// Get the output of the command
+	output, _ := cmd.CombinedOutput()
 
 	// Check if the output contains the positive detection
 	if strings.Contains(string(output), conf["out"]) {
@@ -98,26 +49,6 @@ func scanSlice(fileData []byte, conf map[string]string) bool {
 	return scanFile(tempFile.Name(), conf)
 }
 
-func checkDinamic(binaryPath string, conf map[string]string) bool {
-	// Read the files content
-	data, err := os.ReadFile(binaryPath)
-	if err != nil {
-		fmt.Println("[!] Error reading file:", err)
-		os.Exit(1)
-	}
-
-	// Split the data into half
-	firstHalf := data[:len(data)/2]
-	secondHalf := data[len(data)/2:]
-
-	// Check both halves for malware
-	if scanSlice(firstHalf, conf) || scanSlice(secondHalf, conf) {
-		return false
-	} else {
-		return true
-	}
-}
-
 func checkStatic(binaryPath string, conf map[string]string) string {
 	// Read the files content
 	data, err := os.ReadFile(binaryPath)
@@ -132,11 +63,8 @@ func checkStatic(binaryPath string, conf map[string]string) string {
 
 	// Binary search for the malicious content
 	for upperBound-lastGood > 1 {
-		// Get the current slice
-		currentData := data[:mid]
-
 		// Check the slice for malware
-		if scanSlice(currentData, conf) {
+		if scanSlice(data[0:mid], conf) {
 			threatFound = true
 			upperBound = mid
 		} else {
@@ -148,10 +76,23 @@ func checkStatic(binaryPath string, conf map[string]string) string {
 
 	// Return the result
 	if threatFound {
-		return fmt.Sprintf("Malicious content found at offset: %08x (%d bytes)\n%s", lastGood, len(data)-lastGood, hexDump(binaryPath, int64(lastGood)))
+
+		// Get the start and end of the malicious content
+		start := lastGood - 32
+		if start < 0 {
+			start = 0
+		}
+
+		// Get the start and end of the malicious content
+		end := mid + 32
+		if end > len(data) {
+			end = len(data)
+		}
+
+		return fmt.Sprintf("Malicious content found at offset: %08x \n%s\n", lastGood, hex.Dump(data[start:end]))
 	}
 
-	return "Payload not detected."
+	return ""
 }
 
 func CheckMal(binaryPath string, conf map[string]string) string {
@@ -160,11 +101,9 @@ func CheckMal(binaryPath string, conf map[string]string) string {
 		return "Payload not detected."
 	}
 
-	// Check for Dynamic Detection
-	if checkDinamic(binaryPath, conf) {
-		return "Payload detected dynamically."
+	if static := checkStatic(binaryPath, conf); static != "" {
+		return static
 	}
-
-	// Check for Static Detection
-	return checkStatic(binaryPath, conf)
+	
+	return "Payload detected dynamically."
 }

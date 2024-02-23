@@ -3,15 +3,9 @@ package utils
 import (
 	"os"
 	"fmt"
-	"github.com/BurntSushi/toml"
+	"encoding/json"
 	"regexp"
 )
-
-type config struct {
-	name string `toml:"name"`
-	cmd  string `toml:"cmd"`
-	out  string `toml:"out"`
-}
 
 func FileToConf(configPath string) map[string]string {
 	data, err := os.ReadFile(configPath)
@@ -20,25 +14,19 @@ func FileToConf(configPath string) map[string]string {
 		os.Exit(1)
 	}
 
-	var conf config
-	_, err = toml.Decode(string(data), &conf)
+	var conf map[string]string
+	err = json.Unmarshal(data, &conf)
 	if err != nil {
-		fmt.Println("[!] Error parsing TOML:", err)
+		fmt.Println("[!] Error parsing config file:", err)
 		os.Exit(1)
 	}
 
-	// Cast to map
-	confMap := make(map[string]string)
-	confMap["name"] = conf.name
-	confMap["cmd"] 	= conf.cmd
-	confMap["out"] 	= conf.out
-
-	return confMap
+	return conf
 }
 
 func GetConf(scanner string) map[string]string {
 	// Check if its a config file
-	re := regexp.MustCompile(`(?i)\.toml$`)
+	re := regexp.MustCompile(`(?i)\.json$`)
 	if re.MatchString(scanner){
 		return FileToConf(scanner)
 	}
@@ -49,7 +37,8 @@ func GetConf(scanner string) map[string]string {
 	// Windows Defender
 	builtInConfs["winDef"] = map[string]string {
 		"name": "Windows Defender",
-		"cmd":	"MpCmdRun.exe -Scan -ScanType 3 -File {{file}} -DisableRemediation -Trace -Level 0x10",
+		"cmd":	"MpCmdRun.exe",
+		"args":	" -Scan -ScanType 3 -File {{file}} -DisableRemediation -Trace -Level 0x10",
 		"out":	"Threat information",
 	}
 
