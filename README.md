@@ -28,6 +28,10 @@ $ GOOS=windows GOARCH=amd64 go build -o ../bin/multcheck_x64.exe main.go
 $ GOOS=windows GOARCH=386 go build -o ../bin/multcheck_x32.exe main.go
 ```
 
+## Demo
+
+https://github.com/MultSec/MultCheck/assets/55480558/b3105f45-a2d2-42e2-b938-5388f0dc000a
+
 ## Usage
 MultCheck accepts a target file as an argument:
 `./multcheck <target_file>`
