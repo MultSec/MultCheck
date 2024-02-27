@@ -7,8 +7,6 @@
   
 </div>
 
->:warning: **This project is still in development, and is not ready for use.**
-
 MultCheck is a malware-analysis tool that can be used to test the detection of a file by multiple AV engines.
 
 It is designed to be easy to use, and to be able to test multiple AV engines. It is also designed to be easy to extend, and to be able to add custom AV engines.
