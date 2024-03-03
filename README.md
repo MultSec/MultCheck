@@ -79,7 +79,7 @@ PS C:\Users\pengrey\Downloads>
 ```
 
 ## License
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+This project is licensed under the GNU GEneralL Public License - see the [LICENSE](LICENSE) file for details.
 
 ## Acknowledgements
 This project is inspired by the following projects:
