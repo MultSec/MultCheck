@@ -28,7 +28,7 @@ $ GOOS=windows GOARCH=386 go build -o ../bin/multcheck_x32.exe main.go
 
 ## Demo
 
-https://multsec.github.io/docs/multcheck/usage/multcheck_usage.mp4
+https://github.com/MultSec/MultCheck/assets/55480558/bf3bf85a-e9b1-408a-ab9d-bf9486602b15
 
 ## Usage
 MultCheck accepts a scanner configuration file and a target file as arguments. The scanner configuration file is a JSON file that contains the configuration for the AV engine to be used. The target file is the file that will be scanned.
