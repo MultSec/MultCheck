@@ -31,17 +31,11 @@ $ GOOS=windows GOARCH=386 go build -o ../bin/multcheck_x32.exe main.go
 https://github.com/MultSec/MultCheck/assets/55480558/b3105f45-a2d2-42e2-b938-5388f0dc000a
 
 ## Usage
-MultCheck accepts a target file as an argument:
-`./multcheck <target_file>`
+MultCheck accepts a scanner configuration file and a target file as arguments. The scanner configuration file is a JSON file that contains the configuration for the AV engine to be used. The target file is the file that will be scanned.
 
-Different built-in scanners can be used by specifying the `-scanner` flag:
-`./multcheck -scanner <scanner_name> <target_file>`
-
-Custom scanners can be added by creating a configuration file and providing the path to the file through the `-scanner` flag:
-`./multcheck -scanner <path_to_config_file> <target_file>`
-
-## Supported Scanners
-- Windows Defender (winDef)
+```bash
+$ ./multcheck -config <path_to_config_file> <target_file>
+```
 
 ## Configuration
 The configuration file for custom scanners is a JSON file with the following structure:
@@ -55,9 +49,21 @@ The configuration file for custom scanners is a JSON file with the following str
 }
 ```
 
+The `args` field is a string that contains the arguments to be passed to the scanner. The `{{file}}` string is a placeholder that will be replaced with the target file name. The `out` field is a string that is present in the output of the scanner when the target file is detected as malicious.
+
+### Example
+```json
+{
+  "name": "Windows Defender",
+  "cmd": "C:\\ProgramData\\Microsoft\\Windows Defender\\Platform\\4.18.23100.2009-0\\MpCmdRun.exe",
+  "args": "-Scan -ScanType 3 -File {{file}} -DisableRemediation -Trace -Level 0x10",
+  "out": "Threat information"
+}
+```
+
 ## Example
 ```powershell
-PS C:\Users\pengrey\Downloads> .\multcheck.exe -scanner .\windef.json C:\Users\pengrey\Downloads\mimikatz.exe
+PS C:\Users\pengrey\Downloads> .\multcheck.exe -config .\windef.json C:\Users\pengrey\Downloads\mimikatz.exe
 [>] Result: Malicious content found at offset: 00000121
 00000000  d1 27 71 71 a9 b6 71 52  69 63 68 70 a9 b6 71 00  |.'qq..qRichp..q.|
 00000010  00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 50  |...............P|
@@ -65,7 +71,7 @@ PS C:\Users\pengrey\Downloads> .\multcheck.exe -scanner .\windef.json C:\Users\p
 00000030  00 00 00 f0 00 22 00 0b  02 09 00 00 2c 0c 00 00  |....."......,...|
 
 
-PS C:\Users\pengrey\Downloads> .\multcheck.exe -scanner .\windef.json C:\Users\pengrey\Downloads\Rubeus.exe
+PS C:\Users\pengrey\Downloads> .\multcheck.exe -config .\windef.json C:\Users\pengrey\Downloads\Rubeus.exe
 [>] Result: Malicious content found at offset: 00048e3d
 00000000  65 74 5f 61 64 64 69 74  69 6f 6e 61 6c 5f 74 69  |et_additional_ti|
 00000010  63 6b 65 74 73 00 67 65  74 5f 74 69 63 6b 65 74  |ckets.get_ticket|
@@ -73,7 +79,7 @@ PS C:\Users\pengrey\Downloads> .\multcheck.exe -scanner .\windef.json C:\Users\p
 00000030  73 74 65 6d 2e 4e 65 74  2e 53 6f 63 6b 65 74 73  |stem.Net.Sockets|
 
 
-PS C:\Users\pengrey\Downloads> .\multcheck.exe -scanner .\windef.json C:\Users\pengrey\Downloads\multcheck.exe
+PS C:\Users\pengrey\Downloads> .\multcheck.exe -config .\windef.json C:\Users\pengrey\Downloads\multcheck.exe
 [>] Result: Payload not detected.
 PS C:\Users\pengrey\Downloads>
 ```

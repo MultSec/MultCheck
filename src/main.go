@@ -9,8 +9,8 @@ import (
 )
 
 func main() {
-	var scanner string
-	flag.StringVar(&scanner, "scanner", "winDef", "Name of the scanner to be used or config file to be used.")
+	var configPath string
+	flag.StringVar(&configPath, "config", "", "Config file to be used.")
 	flag.Parse()
 
 	args := flag.Args()
@@ -21,8 +21,8 @@ func main() {
 	}
 	binaryPath := args[0]
 
-	// Retrieve scanner configuration
-	conf := utils.GetConf(scanner)
+	// Retrieve configPath configuration
+	conf := utils.GetConf(configPath)
 
 	result := scan.CheckMal(binaryPath, conf)
 	fmt.Printf("[>] Result: %s\n", result)
