@@ -27,7 +27,7 @@ $ GOOS=windows GOARCH=386 go build -o ../bin/multcheck_32.exe
 ```
 
 ## Demo
-
+https://github.com/MultSec/MultCheck/assets/55480558/708c9f74-aef8-4950-bf09-e27987eddc17
 
 # Documentation
 For more information on how to use the MultLdr-cli, check the [documentation](https://multsec.github.io/docs/multcheck/)
