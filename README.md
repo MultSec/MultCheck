@@ -1,5 +1,5 @@
 <div align="center">
-  <img width="125px" src="assets/MultSCheck.png" />
+  <img width="125px" src="assets/MultCheck.png" />
   <h1>MultCheck</h1>
   <br/>
 
