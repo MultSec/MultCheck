@@ -20,15 +20,14 @@ It is designed to be easy to use, and to be able to test multiple AV engines. It
 $ cd src
 # Build for Windows
 ## 64-bit
-$ GOOS=windows GOARCH=amd64 go build -o ../bin/multcheck_x64.exe main.go
+$ GOOS=windows GOARCH=amd64 go build -o ../bin/multcheck_64.exe
 
 ## 32-bit
-$ GOOS=windows GOARCH=386 go build -o ../bin/multcheck_x32.exe main.go
+$ GOOS=windows GOARCH=386 go build -o ../bin/multcheck_32.exe
 ```
 
 ## Demo
 
-https://github.com/MultSec/MultCheck/assets/55480558/bf3bf85a-e9b1-408a-ab9d-bf9486602b15
 
 # Documentation
 For more information on how to use the MultLdr-cli, check the [documentation](https://multsec.github.io/docs/multcheck/)
