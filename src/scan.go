@@ -5,6 +5,7 @@ import (
 	"os"
 	"os/exec"
 	"strings"
+	"runtime"
 	"encoding/hex"
 	"path/filepath"
 )
@@ -17,20 +18,12 @@ func scanFile(binaryPath string, conf map[string]string) (bool, error) {
     }
 
 	// Replace placeholder with actual file path
-	cmdArgs := strings.Replace(conf["args"], "{{file}}", absPath, -1)
-	scanArgs := strings.Fields(cmdArgs)
-	
-	// Debug output
-	fmt.Println("Command:", conf["cmd"])
-	fmt.Println("Arguments:", scanArgs)
+	cmd := strings.Replace(conf["cmd"], "{{file}}", absPath, -1)
 
 	// Execute the scanner command
-	cmd := exec.Command(conf["cmd"], scanArgs...)
-
-	// Get the output of the command
-	output, err := cmd.CombinedOutput()
-	if err != nil {
-		return false, fmt.Errorf("failed to run command (\"%s %s\") with error: %v", conf["cmd"], cmdArgs, err)
+	output, err := exec.Command("powershell.exe", "-Command", cmd).CombinedOutput()
+	if runtime.GOOS != "windows" {
+		return false, fmt.Errorf("program only works on windows")
 	}
 
 	// Check if the output contains the positive detection
@@ -122,7 +115,7 @@ func CheckMal(binaryPath string, conf map[string]string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-
+	
 	if !scanResult {
 		return "Not malicious", nil
 	}
@@ -135,6 +128,6 @@ func CheckMal(binaryPath string, conf map[string]string) (string, error) {
 	if static != "" {
 		return static, nil
 	}
-	
+
 	return "Whole file is malicious", nil
 }
