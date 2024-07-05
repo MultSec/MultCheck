@@ -55,6 +55,9 @@ func scanSlice(fileData []byte, conf map[string]string) (bool, error) {
 
 	// Scan the file slice
 	scanResult, err := scanFile(tempFile.Name(), conf)
+	if err != nil {
+		return false, fmt.Errorf("failed to scan temp file: %v", err)
+	}
 
 	return scanResult, nil
 }
