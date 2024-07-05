@@ -1,4 +1,4 @@
-package scan
+package main
 
 import (
 	"fmt"
@@ -8,7 +8,7 @@ import (
 	"encoding/hex"
 )
 
-func scanFile(binaryPath string, conf map[string]string) bool {
+func scanFile(binaryPath string, conf map[string]string) (bool, error) {
 	// Replace placeholder with actual file path
 	cmdArgs := strings.Replace(conf["args"], "{{file}}", binaryPath, -1)
 	scanArgs := strings.Fields(cmdArgs)
@@ -17,22 +17,24 @@ func scanFile(binaryPath string, conf map[string]string) bool {
 	cmd := exec.Command(conf["cmd"], scanArgs...)
 
 	// Get the output of the command
-	output, _ := cmd.CombinedOutput()
+	output, err := cmd.CombinedOutput()
+	if err != nil {
+		return false, fmt.Errorf("failed to run command (\"%s %s\") with error: %v", conf["cmd"], scanArgs, err)
+	}
 
 	// Check if the output contains the positive detection
 	if strings.Contains(string(output), conf["out"]) {
-		return true
+		return true, nil
 	} else {
-		return false
+		return false, nil
 	}
 }
 
-func scanSlice(fileData []byte, conf map[string]string) bool {
+func scanSlice(fileData []byte, conf map[string]string) (bool, error) {
 	// Create a temp file to scan
 	tempFile, err := os.CreateTemp("", "slice_scan_")
 	if err != nil {
-		fmt.Println("[!] Error creating temp file:", err)
-		os.Exit(1)
+		return false, fmt.Errorf("failed to create temp file: %v", err)
 	}
 
 	// Defer cleanup
@@ -41,20 +43,20 @@ func scanSlice(fileData []byte, conf map[string]string) bool {
 
 	_, err = tempFile.Write(fileData)
 	if err != nil {
-		fmt.Println("[!] Error writing to temp file:", err)
-		os.Exit(1)
+		return false, fmt.Errorf("failed to write to temp file: %v", err)
 	}
 
 	// Scan the file slice
-	return scanFile(tempFile.Name(), conf)
+	scanResult, err := scanFile(tempFile.Name(), conf)
+
+	return scanResult, nil
 }
 
-func checkStatic(binaryPath string, conf map[string]string) string {
+func checkStatic(binaryPath string, conf map[string]string) (string, error) {
 	// Read the files content
 	data, err := os.ReadFile(binaryPath)
 	if err != nil {
-		fmt.Println("[!] Error reading file:", err)
-		os.Exit(1)
+		return "", fmt.Errorf("failed to read file: %v", err)
 	}
 
 	// Set the initial values
@@ -64,7 +66,12 @@ func checkStatic(binaryPath string, conf map[string]string) string {
 	// Binary search for the malicious content
 	for upperBound-lastGood > 1 {
 		// Check the slice for malware
-		if scanSlice(data[0:mid], conf) {
+		scanResult , err := scanSlice(data[0:mid], conf)
+		if err != nil {
+			return "", err
+		}
+
+		if scanResult {
 			threatFound = true
 			upperBound = mid
 		} else {
@@ -89,21 +96,31 @@ func checkStatic(binaryPath string, conf map[string]string) string {
 			end = len(data)
 		}
 
-		return fmt.Sprintf("Malicious content found at offset: %08x \n%s\n", lastGood, hex.Dump(data[start:end]))
+		return fmt.Sprintf("Malicious content found at offset: %08x \n%s\n", lastGood, hex.Dump(data[start:end])), nil
 	}
 
-	return ""
+	return "", nil
 }
 
-func CheckMal(binaryPath string, conf map[string]string) string {
+func CheckMal(binaryPath string, conf map[string]string) (string, error) {
 	// Check for Detection
-	if !scanFile(binaryPath, conf) {
-		return "Payload not detected."
+	scanResult, err := scanFile(binaryPath, conf)
+	if err != nil {
+		return "", err
 	}
 
-	if static := checkStatic(binaryPath, conf); static != "" {
-		return static
+	if !scanResult {
+		return "Not malicious", nil
+	}
+
+	static, err := checkStatic(binaryPath, conf)
+	if err != nil {
+		return "", err
 	}
 	
-	return "Payload detected dynamically."
+	if static != "" {
+		return static, nil
+	}
+	
+	return "Whole file is malicious", nil
 }

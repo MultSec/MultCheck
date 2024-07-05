@@ -3,9 +3,6 @@ package main
 import (
 	"flag"
 	"fmt"
-	"os"
-	"github.com/MultSec/MultCheck/pkg/utils"
-	"github.com/MultSec/MultCheck/pkg/scan"
 )
 
 func main() {
@@ -15,15 +12,25 @@ func main() {
 
 	args := flag.Args()
 	if len(args) < 1 {
-		fmt.Println("[?] Usage: multscan [OPTIONS] PAYLOAD_FILE_PATH")
-		flag.PrintDefaults()
-		os.Exit(1)
+		printLog(logInfo, "Usage: multscan [OPTIONS] PAYLOAD_FILE_PATH")
+		return
 	}
 	binaryPath := args[0]
 
 	// Retrieve configPath configuration
-	conf := utils.GetConf(configPath)
+	conf, err := GetConf(configPath)
+	if err != nil {
+		printLog(logError, fmt.Sprintf("%v", err))
+		return
+	}
 
-	result := scan.CheckMal(binaryPath, conf)
-	fmt.Printf("[>] Result: %s\n", result)
+	result, err := CheckMal(binaryPath, conf)
+	if err != nil {
+		printLog(logError, fmt.Sprintf("%v", err))
+		return
+	}
+
+	printLog(logSuccess, fmt.Sprintf("Result: %s\n", result))
+
+	return
 }
