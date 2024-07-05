@@ -103,7 +103,7 @@ func checkStatic(binaryPath string, conf map[string]string) (string, error) {
 			end = len(data)
 		}
 
-		return fmt.Sprintf("Malicious content found at offset: %08x \n%s\n", lastGood, hex.Dump(data[start:end])), nil
+		return fmt.Sprintf("Malicious content found (offset: %08x). \n%s\n", lastGood, hex.Dump(data[start:end])), nil
 	}
 
 	return "", nil
