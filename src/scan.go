@@ -6,11 +6,18 @@ import (
 	"os/exec"
 	"strings"
 	"encoding/hex"
+	"path/filepath"
 )
 
 func scanFile(binaryPath string, conf map[string]string) (bool, error) {
+	// Get absolute path
+	absPath, err := filepath.Abs(binaryPath)
+    if err != nil {
+		return false, fmt.Errorf("failed to get absolute path with error: %v", err)
+    }
+
 	// Replace placeholder with actual file path
-	cmdArgs := strings.Replace(conf["args"], "{{file}}", binaryPath, -1)
+	cmdArgs := strings.Replace(conf["args"], "{{file}}", absPath, -1)
 	scanArgs := strings.Fields(cmdArgs)
 	
 	// Execute the scanner command
@@ -19,7 +26,7 @@ func scanFile(binaryPath string, conf map[string]string) (bool, error) {
 	// Get the output of the command
 	output, err := cmd.CombinedOutput()
 	if err != nil {
-		return false, fmt.Errorf("failed to run command (\"%s %s\") with error: %v", conf["cmd"], scanArgs, err)
+		return false, fmt.Errorf("failed to run command (\"%s %s\") with error: %v", conf["cmd"], cmdArgs, err)
 	}
 
 	// Check if the output contains the positive detection
