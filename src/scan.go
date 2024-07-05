@@ -20,6 +20,10 @@ func scanFile(binaryPath string, conf map[string]string) (bool, error) {
 	cmdArgs := strings.Replace(conf["args"], "{{file}}", absPath, -1)
 	scanArgs := strings.Fields(cmdArgs)
 	
+	// Debug output
+	fmt.Println("Command:", conf["cmd"])
+	fmt.Println("Arguments:", scanArgs)
+
 	// Execute the scanner command
 	cmd := exec.Command(conf["cmd"], scanArgs...)
 
